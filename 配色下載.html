@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>五色配色盤全螢幕</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        .action-btn { opacity: 0; transition: opacity 0.2s ease; }
+        .color-card:hover .action-btn { opacity: 1; }
+        .nav-btn { transition: transform 0.2s; }
+        .nav-btn:hover { transform: scale(1.05); }
+    </style>
+</head>
+<body class="flex flex-col h-screen">
+
+    <div id="palette-container" class="flex flex-1 w-full h-full">
+        <!-- 色塊由 JS 動態生成 -->
+    </div>
+
+    <div id="controls" class="fixed bottom-8 right-8 flex gap-4">
+        <button id="download-btn" class="nav-btn bg-black/50 hover:bg-black text-white p-4 rounded-full backdrop-blur-md shadow-xl transition-all" title="下載圖片">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+        </button>
+        <button id="generate-btn" class="nav-btn bg-black/50 hover:bg-black text-white px-8 py-4 rounded-full font-bold backdrop-blur-md shadow-xl transition-all">
+            重新產生
+        </button>
+    </div>
+
+    <div id="toast" class="fixed top-8 left-1/2 -translate-x-1/2 bg-black/80 text-white px-6 py-3 rounded-full shadow-2xl hidden z-50">
+        色碼已複製！
+    </div>
+
+    <script>
+        const paletteContainer = document.getElementById('palette-container');
+        const generateBtn = document.getElementById('generate-btn');
+        const downloadBtn = document.getElementById('download-btn');
+        const controls = document.getElementById('controls');
+        const toast = document.getElementById('toast');
+        let colors = Array(5).fill(null);
+
+        function getRandomColor() {
+            return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0').toUpperCase();
+        }
+
+        function getInverseColor(hex) {
+            const r = parseInt(hex.substr(1, 2), 16);
+            const g = parseInt(hex.substr(3, 2), 16);
+            const b = parseInt(hex.substr(5, 2), 16);
+            const invHex = `#${(255-r).toString(16).padStart(2,'0')}${(255-g).toString(16).padStart(2,'0')}${(255-b).toString(16).padStart(2,'0')}`.toUpperCase();
+            return {
+                hex: invHex,
+                rgb: `rgb(${255-r}, ${255-g}, ${255-b})`
+            };
+        }
+
+        function createPalette() {
+            paletteContainer.innerHTML = '';
+            for (let i = 0; i < 5; i++) {
+                if (!colors[i]) colors[i] = { hex: getRandomColor(), locked: false, showInverse: false };
+                
+                const colorObj = colors[i];
+                const inverseData = getInverseColor(colorObj.hex);
+                
+                // 設定當前色塊的顯示背景色與對應的色碼
+                const displayBg = colorObj.showInverse ? inverseData.rgb : colorObj.hex;
+                const displayHex = colorObj.showInverse ? inverseData.hex : colorObj.hex;
+                
+                // 文字顏色始終為背景色的補色，確保可視性
+                const textColor = colorObj.showInverse ? colorObj.hex : inverseData.rgb;
+                
+                const colorBox = document.createElement('div');
+                colorBox.className = `color-card flex-1 flex flex-col items-center justify-center relative cursor-pointer`;
+                colorBox.style.backgroundColor = displayBg;
+                
+                colorBox.innerHTML = `
+                    <span class="font-mono font-bold text-2xl md:text-4xl pointer-events-none transition-transform hover:scale-110" style="color: ${textColor};">${displayHex}</span>
+                    <div class="absolute top-6 right-6 flex flex-col gap-2">
+                        <button class="action-btn lock-btn text-xs font-semibold px-4 py-2 rounded-full transition-colors ${colorObj.locked ? 'bg-black text-white' : 'bg-white/30 text-black backdrop-blur-sm hover:bg-white/50'}">
+                            ${colorObj.locked ? '已鎖定' : '鎖定'}
+                        </button>
+                        <button class="action-btn invert-btn text-xs font-semibold px-4 py-2 rounded-full transition-colors bg-white/30 text-black backdrop-blur-sm hover:bg-white/50">
+                            ${colorObj.showInverse ? '顯示原色' : '顯示補色'}
+                        </button>
+                    </div>
+                `;
+                
+                colorBox.addEventListener('click', (e) => {
+                    if(!e.target.classList.contains('action-btn')) copyToClipboard(displayHex);
+                });
+
+                colorBox.querySelector('.lock-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    colors[i].locked = !colors[i].locked;
+                    createPalette();
+                });
+
+                colorBox.querySelector('.invert-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    colors[i].showInverse = !colors[i].showInverse;
+                    createPalette();
+                });
+
+                paletteContainer.appendChild(colorBox);
+            }
+        }
+
+        function copyToClipboard(text) {
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.left = '-9999px';
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 1500);
+        }
+
+        downloadBtn.addEventListener('click', () => {
+            controls.style.display = 'none'; 
+            html2canvas(document.body).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'palette.png';
+                link.href = canvas.toDataURL();
+                link.click();
+                controls.style.display = 'flex'; 
+            });
+        });
+
+        generateBtn.addEventListener('click', () => {
+            colors = colors.map(c => c.locked ? c : { hex: getRandomColor(), locked: false, showInverse: false });
+            createPalette();
+        });
+
+        createPalette();
+    </script>
+</body>
+</html>
