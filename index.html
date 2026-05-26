@@ -77,14 +77,15 @@
                 colorBox.className = `color-card grow flex flex-col items-center justify-center relative cursor-pointer`;
                 colorBox.style.backgroundColor = displayBg;
                 
+                // 調整按鈕順序：invert-btn (補色) 現在在 lock-btn (鎖定) 前面 (左邊)
                 colorBox.innerHTML = `
                     <span class="font-mono font-bold text-2xl md:text-4xl pointer-events-none transition-transform hover:scale-110" style="color: ${textColor};">${displayHex}</span>
                     <div class="absolute top-6 right-6 flex flex-col gap-2 z-30">
-                        <button class="action-btn lock-btn text-xs font-semibold px-4 py-2 rounded-full transition-colors ${colorObj.locked ? 'bg-black text-white' : 'bg-white/30 text-black backdrop-blur-sm hover:bg-white/50'}">
-                            ${colorObj.locked ? '已鎖定' : '鎖定'}
-                        </button>
                         <button class="action-btn invert-btn text-xs font-semibold px-4 py-2 rounded-full transition-colors bg-white/30 text-black backdrop-blur-sm hover:bg-white/50">
                             ${colorObj.showInverse ? '顯示原色' : '顯示補色'}
+                        </button>
+                        <button class="action-btn lock-btn text-xs font-semibold px-4 py-2 rounded-full transition-colors ${colorObj.locked ? 'bg-black text-white' : 'bg-white/30 text-black backdrop-blur-sm hover:bg-white/50'}">
+                            ${colorObj.locked ? '已鎖定' : '鎖定'}
                         </button>
                     </div>
                 `;
