@@ -16,12 +16,13 @@
 </head>
 <body>
 
-    <div id="palette-container" class="flex flex-col md:flex-row grow w-full h-full">
+    <!-- 移除多餘的間距，確保橫式滿版 -->
+    <div id="palette-container" class="flex flex-col md:flex-row grow w-full h-screen">
         <!-- 色塊由 JS 動態生成 -->
     </div>
 
-    <!-- 調整控制列位置：手機版左下角，桌機版右下角 -->
-    <div id="controls" class="fixed bottom-8 left-8 md:right-8 md:left-auto flex gap-4 z-40">
+    <!-- 調整控制列位置：手機版左下角，改為垂直排列 -->
+    <div id="controls" class="fixed bottom-8 left-8 md:right-8 md:left-auto flex flex-col md:flex-row gap-4 z-40">
         <button id="download-btn" class="nav-btn bg-black/50 hover:bg-black text-white p-4 rounded-full backdrop-blur-md shadow-xl transition-all" title="下載圖片">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
