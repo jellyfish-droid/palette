@@ -7,21 +7,22 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; }
+        /* 調整 body 樣式，確保在手機瀏覽器中不會被分頁欄遮擋 */
+        body { min-height: 100vh; display: flex; flex-direction: column; margin: 0; }
         .action-btn { opacity: 0; transition: opacity 0.2s ease; }
         .color-card:hover .action-btn { opacity: 1; }
         .nav-btn { transition: transform 0.2s; }
         .nav-btn:hover { transform: scale(1.05); }
     </style>
 </head>
-<body class="flex flex-col h-screen">
+<body>
 
-    <!-- 調整為手機直式 flex-col，桌機橫式 flex-row -->
-    <div id="palette-container" class="flex flex-col md:flex-row flex-1 w-full h-full">
+    <!-- 調整為手機直式 flex-col，桌機橫式 flex-row，並設定為 grow 填滿剩餘空間 -->
+    <div id="palette-container" class="flex flex-col md:flex-row grow w-full min-h-[90vh] md:min-h-screen">
         <!-- 色塊由 JS 動態生成 -->
     </div>
 
-    <div id="controls" class="fixed bottom-8 right-8 flex gap-4">
+    <div id="controls" class="fixed bottom-8 right-8 flex gap-4 z-40">
         <button id="download-btn" class="nav-btn bg-black/50 hover:bg-black text-white p-4 rounded-full backdrop-blur-md shadow-xl transition-all" title="下載圖片">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -72,7 +73,7 @@
                 const textColor = colorObj.showInverse ? colorObj.hex : inverseData.rgb;
                 
                 const colorBox = document.createElement('div');
-                colorBox.className = `color-card flex-1 flex flex-col items-center justify-center relative cursor-pointer`;
+                colorBox.className = `color-card grow flex flex-col items-center justify-center relative cursor-pointer min-h-[150px]`;
                 colorBox.style.backgroundColor = displayBg;
                 
                 colorBox.innerHTML = `
