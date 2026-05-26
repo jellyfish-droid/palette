@@ -16,7 +16,8 @@
 </head>
 <body class="flex flex-col h-screen">
 
-    <div id="palette-container" class="flex flex-1 w-full h-full">
+    <!-- 調整為手機直式 flex-col，桌機橫式 flex-row -->
+    <div id="palette-container" class="flex flex-col md:flex-row flex-1 w-full h-full">
         <!-- 色塊由 JS 動態生成 -->
     </div>
 
@@ -66,11 +67,8 @@
                 const colorObj = colors[i];
                 const inverseData = getInverseColor(colorObj.hex);
                 
-                // 設定當前色塊的顯示背景色與對應的色碼
                 const displayBg = colorObj.showInverse ? inverseData.rgb : colorObj.hex;
                 const displayHex = colorObj.showInverse ? inverseData.hex : colorObj.hex;
-                
-                // 文字顏色始終為背景色的補色，確保可視性
                 const textColor = colorObj.showInverse ? colorObj.hex : inverseData.rgb;
                 
                 const colorBox = document.createElement('div');
